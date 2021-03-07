@@ -1,6 +1,5 @@
 init:
-	npm install
-	npm install --prefix project-6/
+	cd project-6 && npm install && truffle compile
 
 dev:
 	truffle deploy
@@ -8,3 +7,6 @@ dev:
 
 test:
 	truffle test
+
+run-ganache:
+	ganache-cli -m "spirit supply whale amount human item harsh scare congress discover talent hamster"
