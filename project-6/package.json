@@ -1,5 +1,5 @@
 {
-  "name": "supply-chain-E",
+  "name": "project-6-supply-chain-golub",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,6 +11,11 @@
   "author": "pk <pkrasam@gmail.com> (https://ipfs.infura.io/ipfs/QmSXiR9Khm3yo1J67nUopvVBxFJ8YGN2fUGZ34Etr3m92x/)",
   "license": "MIT",
   "devDependencies": {
-    "lite-server": "2.4.0"
+    "lite-server": "^2.6.1"
+  },
+  "dependencies": {
+    "ethjs-abi": "^0.2.1",
+    "truffle-blockchain-utils": "^0.0.10",
+    "web3": "^1.3.4"
   }
 }

@@ -1,3 +1,5 @@
+// let Web3 = require("web3");
+
 App = {
     web3Provider: null,
     contracts: {},
@@ -37,22 +39,6 @@ App = {
         App.distributorID = $("#distributorID").val();
         App.retailerID = $("#retailerID").val();
         App.consumerID = $("#consumerID").val();
-
-        console.log(
-            App.sku,
-            App.upc,
-            App.ownerID, 
-            App.originFarmerID, 
-            App.originFarmName, 
-            App.originFarmInformation, 
-            App.originFarmLatitude, 
-            App.originFarmLongitude, 
-            App.productNotes, 
-            App.productPrice, 
-            App.distributorID, 
-            App.retailerID, 
-            App.consumerID
-        );
     },
 
     initWeb3: async function () {
@@ -77,12 +63,12 @@ App = {
             App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
         }
 
-        App.getMetaskAccountID();
+        App.getMetMaskAccountID();
 
         return App.initSupplyChain();
     },
 
-    getMetaskAccountID: function () {
+    getMetMaskAccountID: function () {
         web3 = new Web3(App.web3Provider);
 
         // Retrieving accounts
@@ -91,7 +77,7 @@ App = {
                 console.log('Error:',err);
                 return;
             }
-            console.log('getMetaskID:',res);
+            console.log('getMetMaskID:',res);
             App.metamaskAccountID = res[0];
 
         })
@@ -100,14 +86,13 @@ App = {
     initSupplyChain: function () {
         /// Source the truffle compiled smart contracts
         var jsonSupplyChain='../../build/contracts/SupplyChain.json';
-        
+
         /// JSONfy the smart contracts
         $.getJSON(jsonSupplyChain, function(data) {
-            console.log('data',data);
             var SupplyChainArtifact = data;
             App.contracts.SupplyChain = TruffleContract(SupplyChainArtifact);
             App.contracts.SupplyChain.setProvider(App.web3Provider);
-            
+
             App.fetchItemBufferOne();
             App.fetchItemBufferTwo();
             App.fetchEvents();
@@ -124,7 +109,7 @@ App = {
     handleButtonClick: async function(event) {
         event.preventDefault();
 
-        App.getMetaskAccountID();
+        App.getMetMaskAccountID();
 
         var processId = parseInt($(event.target).data('id'));
         console.log('processId',processId);
@@ -169,12 +154,12 @@ App = {
 
         App.contracts.SupplyChain.deployed().then(function(instance) {
             return instance.harvestItem(
-                App.upc, 
-                App.metamaskAccountID, 
-                App.originFarmName, 
-                App.originFarmInformation, 
-                App.originFarmLatitude, 
-                App.originFarmLongitude, 
+                App.upc,
+                App.metamaskAccountID,
+                App.originFarmName,
+                App.originFarmInformation,
+                App.originFarmLatitude,
+                App.originFarmLongitude,
                 App.productNotes
             );
         }).then(function(result) {
@@ -198,7 +183,7 @@ App = {
             console.log(err.message);
         });
     },
-    
+
     packItem: function (event) {
         event.preventDefault();
         var processId = parseInt($(event.target).data('id'));
@@ -305,7 +290,7 @@ App = {
     fetchItemBufferTwo: function () {
     ///    event.preventDefault();
     ///    var processId = parseInt($(event.target).data('id'));
-                        
+
         App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.fetchItemBufferTwo.call(App.upc);
         }).then(function(result) {
@@ -334,7 +319,7 @@ App = {
         }).catch(function(err) {
           console.log(err.message);
         });
-        
+
     }
 };
 
