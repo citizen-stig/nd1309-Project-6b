@@ -1,4 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
+project-6/build
+project-6/node_modules
 .DS_Store
 .AppleDouble
 .LSOverride

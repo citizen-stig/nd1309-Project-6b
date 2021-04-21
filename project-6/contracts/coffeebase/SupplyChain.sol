@@ -62,13 +62,13 @@ contract SupplyChain {
     event Received(uint upc);
     event Purchased(uint upc);
 
-    // Define a modifer that checks to see if msg.sender == owner of the contract
+    // Define a modifier that checks to see if msg.sender == owner of the contract
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
 
-    // Define a modifer that verifies the Caller
+    // Define a modifier that verifies the Caller
     modifier verifyCaller (address _address) {
         require(msg.sender == _address);
         _;

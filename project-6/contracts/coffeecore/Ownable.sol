@@ -30,7 +30,7 @@ contract Ownable {
         return msg.sender == origOwner;
     }
 
-    /// Define a function to renounce ownerhip
+    /// Define a function to renounce ownership
     function renounceOwnership() public onlyOwner {
         emit TransferOwnership(origOwner, address(0));
         origOwner = address(0);

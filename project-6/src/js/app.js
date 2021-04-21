@@ -60,15 +60,15 @@ App = {
         }
         // If no injected web3 instance is detected, fall back to Ganache
         else {
-            App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+            App.web3Provider = new Web3.providers.HttpProvider('http://localhost:8545');
         }
 
-        App.getMetMaskAccountID();
+        App.getMetaMaskAccountID();
 
         return App.initSupplyChain();
     },
 
-    getMetMaskAccountID: function () {
+    getMetaMaskAccountID: function () {
         web3 = new Web3(App.web3Provider);
 
         // Retrieving accounts
@@ -77,7 +77,6 @@ App = {
                 console.log('Error:',err);
                 return;
             }
-            console.log('getMetMaskID:',res);
             App.metamaskAccountID = res[0];
 
         })
@@ -85,12 +84,11 @@ App = {
 
     initSupplyChain: function () {
         /// Source the truffle compiled smart contracts
-        var jsonSupplyChain='../../build/contracts/SupplyChain.json';
+        const jsonSupplyChain = '../../build/contracts/SupplyChain.json';
 
         /// JSONfy the smart contracts
         $.getJSON(jsonSupplyChain, function(data) {
-            var SupplyChainArtifact = data;
-            App.contracts.SupplyChain = TruffleContract(SupplyChainArtifact);
+            App.contracts.SupplyChain = TruffleContract(data);
             App.contracts.SupplyChain.setProvider(App.web3Provider);
 
             App.fetchItemBufferOne();
@@ -109,7 +107,7 @@ App = {
     handleButtonClick: async function(event) {
         event.preventDefault();
 
-        App.getMetMaskAccountID();
+        App.getMetaMaskAccountID();
 
         var processId = parseInt($(event.target).data('id'));
         console.log('processId',processId);
@@ -144,7 +142,6 @@ App = {
                 break;
             case 10:
                 return await App.fetchItemBufferTwo(event);
-                break;
             }
     },
 
