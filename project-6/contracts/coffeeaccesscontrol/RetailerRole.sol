@@ -29,7 +29,7 @@ contract RetailerRole {
     }
 
     function renounceRetailer() public {
-        _removeRetailer(account);
+        _removeRetailer(msg.sender);
     }
 
     function _addRetailer(address account) internal {

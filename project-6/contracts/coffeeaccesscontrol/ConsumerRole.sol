@@ -4,6 +4,7 @@ pragma solidity >=0.6.12;
 import "./Roles.sol";
 
 contract ConsumerRole {
+    using Roles for Roles.Role;
 
     event ConsumerAdded(address indexed account);
     event ConsumerRemoved(address indexed account);
@@ -28,7 +29,7 @@ contract ConsumerRole {
     }
 
     function renounceConsumer() public {
-        _removeConsumer(account);
+        _removeConsumer(msg.sender);
     }
 
     function _addConsumer(address account) internal {

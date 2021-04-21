@@ -6,7 +6,7 @@ dev:
 	npm run dev --prefix project-6/
 
 test:
-	truffle test
+	cd project-6 && truffle test
 
 run-ganache:
 	ganache-cli -m "spirit supply whale amount human item harsh scare congress discover talent hamster"
