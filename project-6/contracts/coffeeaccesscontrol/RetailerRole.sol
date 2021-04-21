@@ -11,7 +11,7 @@ contract RetailerRole {
 
     Roles.Role private retailers;
 
-    constructor() {
+    constructor() public {
         _addRetailer(msg.sender);
     }
 

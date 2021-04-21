@@ -54,6 +54,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
     event Shipped(uint upc);
     event Received(uint upc);
     event Purchased(uint upc);
+
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
@@ -117,7 +118,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         _;
     }
 
-    constructor() payable {
+    constructor() public payable {
         owner = payable(msg.sender);
         sku = 1;
         upc = 1;
