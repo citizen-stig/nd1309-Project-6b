@@ -11,7 +11,7 @@ contract FarmerRole {
 
     Roles.Role private farmers;
 
-    constructor() public {
+    constructor() {
         _addFarmer(msg.sender);
     }
 

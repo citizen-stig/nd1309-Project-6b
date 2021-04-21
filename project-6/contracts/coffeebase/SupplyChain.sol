@@ -73,7 +73,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         _;
         uint _price = items[_upc].productPrice;
         uint amountToReturn = msg.value - _price;
-        address payable consumerAddress = address(uint160(items[_upc].consumerID));
+        address payable consumerAddress = payable(address(uint160(items[_upc].consumerID)));
         consumerAddress.transfer(amountToReturn);
     }
 
@@ -117,8 +117,8 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         _;
     }
 
-    constructor() public payable {
-        owner = msg.sender;
+    constructor() payable {
+        owner = payable(msg.sender);
         sku = 1;
         upc = 1;
     }

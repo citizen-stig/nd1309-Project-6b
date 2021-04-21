@@ -11,7 +11,7 @@ contract ConsumerRole {
 
     Roles.Role private consumers;
 
-    constructor() public {
+    constructor() {
         _addConsumer(msg.sender);
     }
 
