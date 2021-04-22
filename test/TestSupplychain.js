@@ -276,5 +276,43 @@ contract('SupplyChain', async accounts => {
             assert.equal(eventEmitted, true, 'Event was not emitted');
         });
     });
+
+    describe('When coffee is received', async function () {
+        let eventEmitted = false;
+        before(async function () {
+            let event = supplyChain.Received();
+            event.on('data', () => {
+                eventEmitted = true;
+            });
+        });
+
+        it('forbids to shipping by non-retailer', async function () {
+            try {
+                await supplyChain.receiveItem(upc, {from: consumerID});
+                assert.fail("Should not allow to receive");
+            } catch (error) {
+                assert.equal("Not a retailer", error.reason);
+            }
+        });
+
+        it('processes without error', async function () {
+            await supplyChain.receiveItem(upc, {from: retailerID});
+        });
+
+        it('item has correct owner', async function () {
+            const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
+            assert.equal(resultBufferOne[2], retailerID, 'Error: Missing or Invalid ownerID');
+        });
+
+        it('item has correct details', async function () {
+            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
+            assert.equal(resultBufferTwo[5], 6, 'Expected "Received" state');
+            assert.equal(resultBufferTwo[7], retailerID, "Expected correct retailerId");
+        });
+
+        it('emits correct event', async function () {
+            assert.equal(eventEmitted, true, 'Event was not emitted');
+        });
+    });
 });
 
