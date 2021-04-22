@@ -151,10 +151,7 @@ App = {
 
     harvestItem: function(event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
         App.contracts.SupplyChain.deployed().then(function(instance) {
-            console.log({instance: instance});
             return instance.harvestItem(
                 App.upc,
                 App.metamaskAccountID,
@@ -175,8 +172,6 @@ App = {
 
     processItem: function (event) {
         event.preventDefault();
-        var processId = parseInt($(event.target).data('id'));
-
         App.contracts.SupplyChain.deployed().then(function(instance) {
             return instance.processItem(App.upc, {from: App.metamaskAccountID});
         }).then(function(result) {
