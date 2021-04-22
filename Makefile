@@ -7,7 +7,7 @@ dev:
 	npm run dev
 
 test:
-	truffle test
+	truffle test --stacktrace
 
 run-ganache:
 	ganache-cli -m "spirit supply whale amount human item harsh scare congress discover talent hamster"

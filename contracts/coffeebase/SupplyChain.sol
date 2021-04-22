@@ -118,6 +118,11 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         _;
     }
 
+    modifier itemPresent(uint _upc) {
+        require(items[_upc].upc != 0, "Item with this UPC not found");
+        _;
+    }
+
     constructor() public payable {
         owner = payable(msg.sender);
         sku = 1;
@@ -140,7 +145,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         string memory _originFarmLongitude,
         string memory _productNotes) onlyFarmer public
     {
-        // TODO: check that item with that _upc is not defined yet
+        require(items[_upc].upc == 0, "Item with this UPC already harvested");
 
         uint product_id = sku * _upc;
         Item memory item = Item(
@@ -164,7 +169,6 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         items[_upc] = item;
         // Increment sku
         sku = sku + 1;
-
 
         emit Harvested(_upc);
     }
@@ -320,7 +324,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
     )
     {
         Item memory item = items[_upc];
-        require(item.ownerID != address(0));
+        require(item.ownerID != address(0), "OOPS");
 
         itemSKU = item.sku;
         itemUPC = item.upc;
