@@ -14,7 +14,7 @@ contract('SupplyChain', async accounts => {
     const originFarmLongitude = "144.341490";
     let productID = sku + upc;
     const productNotes = "Best beans for Espresso";
-    const productPrice = web3.utils.toWei("1", "ether");
+    const productPrice = web3.utils.toWei("1", "microether");
     let itemState = 0;
     const distributorID = accounts[2];
     const retailerID = accounts[3];
@@ -198,113 +198,54 @@ contract('SupplyChain', async accounts => {
         });
     })
 
-    // // 3rd Test
-    // it("Testing smart contract function packItem() that allows a farmer to pack coffee", async () => {
-    //     // Declare and Initialize a variable for event
-    //
-    //
-    //     // Watch the emitted event Packed()
-    //
-    //
-    //     // Mark an item as Packed by calling function packItem()
-    //
-    //
-    //     // Retrieve the just now saved item from blockchain by calling function fetchItem()
-    //
-    //
-    //     // Verify the result set
-    //
-    // })
-    //
-    // // 4th Test
-    // it("Testing smart contract function sellItem() that allows a farmer to sell coffee", async () => {
-    //     // Declare and Initialize a variable for event
-    //
-    //
-    //     // Watch the emitted event ForSale()
-    //
-    //
-    //     // Mark an item as ForSale by calling function sellItem()
-    //
-    //
-    //     // Retrieve the just now saved item from blockchain by calling function fetchItem()
-    //
-    //
-    //     // Verify the result set
-    //
-    // })
-    //
-    // // 5th Test
-    // it("Testing smart contract function buyItem() that allows a distributor to buy coffee", async () => {
-    //     // Declare and Initialize a variable for event
-    //
-    //
-    //     // Watch the emitted event Sold()
-    //     var event = supplyChain.Sold()
-    //
-    //
-    //     // Mark an item as Sold by calling function buyItem()
-    //
-    //
-    //     // Retrieve the just now saved item from blockchain by calling function fetchItem()
-    //
-    //
-    //     // Verify the result set
-    //
-    // })
-    //
-    // // 6th Test
-    // it("Testing smart contract function shipItem() that allows a distributor to ship coffee", async () => {
-    //     // Declare and Initialize a variable for event
-    //
-    //
-    //     // Watch the emitted event Shipped()
-    //
-    //
-    //     // Mark an item as Sold by calling function buyItem()
-    //
-    //
-    //     // Retrieve the just now saved item from blockchain by calling function fetchItem()
-    //
-    //
-    //     // Verify the result set
-    //
-    // })
-    //
-    // // 7th Test
-    // it("Testing smart contract function receiveItem() that allows a retailer to mark coffee received", async () => {
-    //     // Declare and Initialize a variable for event
-    //
-    //
-    //     // Watch the emitted event Received()
-    //
-    //
-    //     // Mark an item as Sold by calling function buyItem()
-    //
-    //
-    //     // Retrieve the just now saved item from blockchain by calling function fetchItem()
-    //
-    //
-    //     // Verify the result set
-    //
-    // })
-    //
-    // // 8th Test
-    // it("Testing smart contract function purchaseItem() that allows a consumer to purchase coffee", async () => {
-    //     // Declare and Initialize a variable for event
-    //
-    //
-    //     // Watch the emitted event Purchased()
-    //
-    //
-    //     // Mark an item as Sold by calling function buyItem()
-    //
-    //
-    //     // Retrieve the just now saved item from blockchain by calling function fetchItem()
-    //
-    //
-    //     // Verify the result set
-    //
-    // })
+    describe('When coffee is bought', async function () {
+        let eventEmitted = false;
+        let value = productPrice + 3000;
+        before(async function () {
+            let event = supplyChain.Sold();
+            event.on('data', () => {
+                eventEmitted = true;
+            });
+        });
+
+        it('forbids buying by non-distributor', async function () {
+            try {
+                await supplyChain.buyItem(upc, {from: originFarmerID, value});
+                assert.fail("Should not allow to buy");
+            } catch (error) {
+                assert.equal("Not a distributor", error.reason);
+            }
+        });
+
+        it('checks insufficient funds', async function () {
+            try {
+                await supplyChain.buyItem(upc, {from: distributorID, value: productPrice - 3000});
+                assert.fail("Should not allow to buy");
+            } catch (error) {
+                assert.equal("Not enough funds", error.reason);
+            }
+        });
+
+        it('buys without error', async function () {
+            await supplyChain.buyItem(upc, {from: distributorID, value});
+        });
+
+        it('item has correct owner', async function () {
+            const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
+            assert.equal(resultBufferOne[2], distributorID, 'Error: Missing or Invalid ownerID');
+        });
+
+        it('item has correct details', async function () {
+            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
+            assert.equal(resultBufferTwo[5], 4, 'Expected "Sold" state');
+            assert.equal(resultBufferTwo[6], distributorID, 'Expected distributor to be presented');
+        });
+
+        it('emits correct event', async function () {
+            assert.equal(eventEmitted, true, 'Event was not emitted');
+        });
+
+    });
+
 });
 

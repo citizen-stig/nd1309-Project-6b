@@ -16,7 +16,7 @@ contract DistributorRole {
     }
 
     modifier onlyDistributor() {
-        require(isDistributor(msg.sender));
+        require(isDistributor(msg.sender), "Not a distributor");
         _;
     }
 
