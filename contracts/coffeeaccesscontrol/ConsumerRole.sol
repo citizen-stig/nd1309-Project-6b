@@ -16,7 +16,7 @@ contract ConsumerRole {
     }
 
     modifier onlyConsumer() {
-        require(isConsumer(msg.sender));
+        require(isConsumer(msg.sender), "Not a consumer");
         _;
     }
 

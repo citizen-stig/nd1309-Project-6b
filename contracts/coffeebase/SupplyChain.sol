@@ -59,7 +59,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         _;
     }
 
-    modifier verifyCaller (address _address) {
+    modifier verifyCaller(address _address) {
         require(msg.sender == _address);
         _;
     }
@@ -207,20 +207,14 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
 
     // Define a function 'purchaseItem' that allows the consumer to mark an item 'Purchased'
     // Use the above modifiers to check if the item is received
-    function purchaseItem(uint _upc) public
-        // Call modifier to check if upc has passed previous supply chain stage
-
-        // Access Control List enforced by calling Smart Contract / DApp
-    {
-        // Update the appropriate fields - ownerID, consumerID, itemState
-
-        // Emit the appropriate event
-
+    function purchaseItem(uint _upc) onlyConsumer received(_upc) public {
+        items[_upc].ownerID = msg.sender;
+        items[_upc].consumerID = msg.sender;
+        items[_upc].itemState = State.Purchased;
+        emit Purchased(_upc);
     }
 
-    // Define a function 'fetchItemBufferOne' that fetches the data
-    function fetchItemBufferOne(uint _upc) public view returns
-    (
+    function fetchItemBufferOne(uint _upc) public view returns (
         uint itemSKU,
         uint itemUPC,
         address ownerID,
@@ -228,9 +222,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         string memory originFarmName,
         string memory originFarmInformation,
         string memory originFarmLatitude,
-        string memory originFarmLongitude
-    )
-    {
+        string memory originFarmLongitude) {
         Item memory item = items[_upc];
         require(item.ownerID != address(0));
 
@@ -243,8 +235,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         originFarmLatitude = item.originFarmLatitude;
         originFarmLongitude = item.originFarmLongitude;
 
-        return
-        (
+        return (
         itemSKU,
         itemUPC,
         ownerID,
@@ -256,9 +247,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         );
     }
 
-    // Define a function 'fetchItemBufferTwo' that fetches the data
-    function fetchItemBufferTwo(uint _upc) public view returns
-    (
+    function fetchItemBufferTwo(uint _upc) public view returns (
         uint itemSKU,
         uint itemUPC,
         uint productID,
@@ -267,9 +256,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         uint itemState,
         address distributorID,
         address retailerID,
-        address consumerID
-    )
-    {
+        address consumerID) {
         Item memory item = items[_upc];
         require(item.ownerID != address(0), "OOPS");
 
@@ -283,8 +270,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         retailerID = item.retailerID;
         consumerID = item.consumerID;
 
-        return
-        (
+        return (
         itemSKU,
         itemUPC,
         productID,

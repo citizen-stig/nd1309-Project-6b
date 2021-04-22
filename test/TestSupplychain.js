@@ -254,7 +254,7 @@ contract('SupplyChain', async accounts => {
             });
         });
 
-        it('forbids to shipping by non-distributor', async function () {
+        it('forbids shipping by non-distributor', async function () {
             try {
                 await supplyChain.shipItem(upc, {from: retailerID});
                 assert.fail("Should not allow to ship");
@@ -263,7 +263,7 @@ contract('SupplyChain', async accounts => {
             }
         });
 
-        it('processes without error', async function () {
+        it('ships without error', async function () {
             await supplyChain.shipItem(upc, {from: distributorID});
         });
 
@@ -286,7 +286,7 @@ contract('SupplyChain', async accounts => {
             });
         });
 
-        it('forbids to shipping by non-retailer', async function () {
+        it('forbids receiving by non-retailer', async function () {
             try {
                 await supplyChain.receiveItem(upc, {from: consumerID});
                 assert.fail("Should not allow to receive");
@@ -295,7 +295,7 @@ contract('SupplyChain', async accounts => {
             }
         });
 
-        it('processes without error', async function () {
+        it('receives without error', async function () {
             await supplyChain.receiveItem(upc, {from: retailerID});
         });
 
@@ -308,6 +308,44 @@ contract('SupplyChain', async accounts => {
             const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
             assert.equal(resultBufferTwo[5], 6, 'Expected "Received" state');
             assert.equal(resultBufferTwo[7], retailerID, "Expected correct retailerId");
+        });
+
+        it('emits correct event', async function () {
+            assert.equal(eventEmitted, true, 'Event was not emitted');
+        });
+    });
+
+    describe('When coffee is purchased', async function () {
+        let eventEmitted = false;
+        before(async function () {
+            let event = supplyChain.Purchased();
+            event.on('data', () => {
+                eventEmitted = true;
+            });
+        });
+
+        it('forbids to shipping by non-consumer', async function () {
+            try {
+                await supplyChain.purchaseItem(upc, {from: originFarmerID});
+                assert.fail("Should not allow to purchase");
+            } catch (error) {
+                assert.equal("Not a consumer", error.reason);
+            }
+        });
+
+        it('purchases without error', async function () {
+            await supplyChain.purchaseItem(upc, {from: consumerID});
+        });
+
+        it('item has correct owner', async function () {
+            const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
+            assert.equal(resultBufferOne[2], consumerID, 'Error: Missing or Invalid ownerID');
+        });
+
+        it('item has correct details', async function () {
+            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
+            assert.equal(resultBufferTwo[5], 7, 'Expected "Purchased" state');
+            assert.equal(resultBufferTwo[8], consumerID, "Expected correct consumerId");
         });
 
         it('emits correct event', async function () {
