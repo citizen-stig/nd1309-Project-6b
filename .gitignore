@@ -4,6 +4,7 @@ node_modules
 .DS_Store
 .AppleDouble
 .LSOverride
+.secret
 Icon
 ._*
 .DocumentRevisions-V100
