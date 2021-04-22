@@ -14,10 +14,10 @@
         "lite-server": "^2.6.1"
     },
     "dependencies": {
-        "@truffle/blockchain-utils": "^0.0.28",
         "@truffle/hdwallet-provider": "^1.2.6",
         "ethjs-abi": "^0.2.1",
         "pify": "^5.0.0",
+        "truffle-blockchain-utils": "^0.0.10",
         "web3": "^1.3.5"
     }
 }
