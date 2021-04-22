@@ -99,6 +99,8 @@ App = {
 
         });
 
+        // https://knowledge.udacity.com/questions/529545
+        web3.eth.defaultAccount = web3.eth.accounts[0];
         return App.bindEvents();
     },
 
