@@ -280,8 +280,16 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         string memory originFarmLongitude
     )
     {
-        // Assign values to the 8 parameters
+        Item memory item = items[_upc];
+        require(item.ownerID != address(0));
 
+        itemSKU = item.sku;
+        itemUPC = item.upc;
+        ownerID = item.ownerID;
+        originFarmerID = item.originFarmerID;
+        originFarmName = item.originFarmName;
+        originFarmLatitude = item.originFarmLatitude;
+        originFarmLongitude = item.originFarmLongitude;
 
         return
         (
