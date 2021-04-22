@@ -15,7 +15,6 @@ contract('SupplyChain', async accounts => {
     let productID = sku + upc;
     const productNotes = "Best beans for Espresso";
     const productPrice = web3.utils.toWei("1", "microether");
-    let itemState = 0;
     const distributorID = accounts[2];
     const retailerID = accounts[3];
     const consumerID = accounts[4];
@@ -244,8 +243,38 @@ contract('SupplyChain', async accounts => {
         it('emits correct event', async function () {
             assert.equal(eventEmitted, true, 'Event was not emitted');
         });
-
     });
 
+    describe('When coffee is shipped', async function () {
+        let eventEmitted = false;
+        before(async function () {
+            let event = supplyChain.Shipped();
+            event.on('data', () => {
+                eventEmitted = true;
+            });
+        });
+
+        it('forbids to shipping by non-distributor', async function () {
+            try {
+                await supplyChain.shipItem(upc, {from: retailerID});
+                assert.fail("Should not allow to ship");
+            } catch (error) {
+                assert.equal("Not a distributor", error.reason);
+            }
+        });
+
+        it('processes without error', async function () {
+            await supplyChain.shipItem(upc, {from: distributorID});
+        });
+
+        it('item has correct state', async function () {
+            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
+            assert.equal(resultBufferTwo[5], 5, 'Expected "Shipped" state');
+        });
+
+        it('emits correct event', async function () {
+            assert.equal(eventEmitted, true, 'Event was not emitted');
+        });
+    });
 });
 

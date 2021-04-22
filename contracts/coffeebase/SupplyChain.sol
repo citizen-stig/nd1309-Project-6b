@@ -172,8 +172,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         emit Processed(_upc);
     }
 
-    function packItem(uint _upc) onlyFarmer processed(_upc) public
-    {
+    function packItem(uint _upc) onlyFarmer processed(_upc) public {
         items[_upc].itemState = State.Packed;
         emit Packed(_upc);
     }
@@ -194,18 +193,9 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         emit Sold(_upc);
     }
 
-    // Define a function 'shipItem' that allows the distributor to mark an item 'Shipped'
-    // Use the above modifers to check if the item is sold
-    function shipItem(uint _upc) public
-        // Call modifier to check if upc has passed previous supply chain stage
-
-        // Call modifier to verify caller of this function
-
-    {
-        // Update the appropriate fields
-
-        // Emit the appropriate event
-
+    function shipItem(uint _upc) onlyDistributor sold(_upc) public {
+        items[_upc].itemState = State.Shipped;
+        emit Shipped(_upc);
     }
 
     // Define a function 'receiveItem' that allows the retailer to mark an item 'Received'
