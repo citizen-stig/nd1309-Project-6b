@@ -6,7 +6,7 @@ This repository contains an Ethereum DApp that demonstrates a Supply Chain flow 
 
 Diagrams are in `diagrams` folder
 
-Contact address on Rinkeby Network:  0x2fDBB4e546101700C3a2a9D26386dBc34880cC11
+Contact address on Rinkeby Network:  [0x2fDBB4e546101700C3a2a9D26386dBc34880cC11](https://rinkeby.etherscan.io/address/0x2fdbb4e546101700c3a2a9d26386dbc34880cc11)
 
 
 
