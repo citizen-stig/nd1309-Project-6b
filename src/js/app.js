@@ -48,10 +48,12 @@ App = {
             App.web3Provider = window.ethereum;
             try {
                 // Request account access
-                await window.ethereum.enable();
+                // await window.ethereum.enable();
+                // await window.ethereum.sendAsync('eth_requestAccounts');
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
             } catch (error) {
                 // User denied account access...
-                console.error("User denied account access")
+                console.error({error, message: "User denied account access"});
             }
         }
         // Legacy dapp browsers...
@@ -150,6 +152,7 @@ App = {
         var processId = parseInt($(event.target).data('id'));
 
         App.contracts.SupplyChain.deployed().then(function(instance) {
+            console.log({instance: instance});
             return instance.harvestItem(
                 App.upc,
                 App.metamaskAccountID,
@@ -163,6 +166,7 @@ App = {
             $("#ftc-item").text(result);
             console.log('harvestItem',result);
         }).catch(function(err) {
+            console.log(err)
             console.log(err.message);
         });
     },
@@ -272,8 +276,6 @@ App = {
     ///   event.preventDefault();
     ///    var processId = parseInt($(event.target).data('id'));
         App.upc = $('#upc').val();
-        console.log('upc',App.upc);
-
         App.contracts.SupplyChain.deployed().then(function(instance) {
           return instance.fetchItemBufferOne(App.upc);
         }).then(function(result) {

@@ -258,7 +258,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         address retailerID,
         address consumerID) {
         Item memory item = items[_upc];
-        require(item.ownerID != address(0), "OOPS");
+        require(item.ownerID != address(0), "Owner Address Should not be zero");
 
         itemSKU = item.sku;
         itemUPC = item.upc;
