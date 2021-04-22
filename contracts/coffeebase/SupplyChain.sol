@@ -35,7 +35,6 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         address consumerID;
     }
 
-    // --------
 
     address payable owner;
     uint upc;
@@ -79,7 +78,8 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
     }
 
     modifier harvested(uint _upc) {
-        require(items[_upc].itemState == State.Harvested);
+        require(items[_upc].ownerID != address(0) && items[_upc].itemState == State.Harvested,
+            "Item should be harvested");
         _;
     }
 
@@ -118,11 +118,6 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         _;
     }
 
-    modifier itemPresent(uint _upc) {
-        require(items[_upc].upc != 0, "Item with this UPC not found");
-        _;
-    }
-
     constructor() public payable {
         owner = payable(msg.sender);
         sku = 1;
@@ -143,9 +138,9 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         string memory _originFarmInformation,
         string memory _originFarmLatitude,
         string memory _originFarmLongitude,
-        string memory _productNotes) onlyFarmer public
-    {
+        string memory _productNotes) onlyFarmer public {
         require(items[_upc].upc == 0, "Item with this UPC already harvested");
+        require(_originFarmerID != address(0), "Farmer address should be valid");
 
         uint product_id = sku * _upc;
         Item memory item = Item(
@@ -167,35 +162,21 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         );
 
         items[_upc] = item;
-        // Increment sku
         sku = sku + 1;
 
         emit Harvested(_upc);
     }
 
-    function processItem(uint _upc) public
-        // Call modifier to check if upc has passed previous supply chain stage
-
-        // Call modifier to verify caller of this function
-
-    {
-        // Update the appropriate fields
-
-        // Emit the appropriate event
-
+    function processItem(uint _upc) onlyFarmer harvested(_upc) public {
+        items[_upc].itemState = State.Processed;
+        emit Processed(_upc);
     }
 
     // Define a function 'packItem' that allows a farmer to mark an item 'Packed'
-    function packItem(uint _upc) public
-        // Call modifier to check if upc has passed previous supply chain stage
-
-        // Call modifier to verify caller of this function
-
+    function packItem(uint _upc) onlyFarmer processed(_upc) public
     {
-        // Update the appropriate fields
-
-        // Emit the appropriate event
-
+        items[_upc].itemState = State.Packed;
+        emit Packed(_upc);
     }
 
     // Define a function 'sellItem' that allows a farmer to mark an item 'ForSale'
@@ -331,6 +312,10 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         productID = item.productID;
         productNotes = item.productNotes;
         productPrice = item.productPrice;
+        itemState = uint256(item.itemState);
+        distributorID = item.distributorID;
+        retailerID = item.retailerID;
+        consumerID = item.consumerID;
 
         return
         (

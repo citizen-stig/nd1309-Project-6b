@@ -42,23 +42,20 @@ contract('SupplyChain', async accounts => {
     console.log("Consumer: accounts[4] ", accounts[4])
 
     let supplyChain;
-    const harvestItem = async () => {
-        await supplyChain.harvestItem(
-            upc,
-            originFarmerID,
-            originFarmName,
-            originFarmInformation,
-            originFarmLatitude,
-            originFarmLongitude,
-            productNotes);
-        upc += 1;
-    }
+
+    before(async () => {
+        supplyChain = await SupplyChain.deployed();
+        await Promise.all([
+            supplyChain.addFarmer(originFarmerID),
+            supplyChain.addDistributor(distributorID),
+            supplyChain.addRetailer(retailerID),
+            supplyChain.addConsumer(consumerID)
+        ]);
+    });
 
     describe('When coffee is harvested', async function () {
         let eventEmitted = false;
-        let thisUPC = upc;
-        before(async function () {
-            supplyChain = await SupplyChain.deployed();
+        before(async () => {
             let event = supplyChain.Harvested();
             event.on('data', e => {
                 eventEmitted = true;
@@ -66,13 +63,20 @@ contract('SupplyChain', async accounts => {
         });
 
         it('harvests without error', async function () {
-            await harvestItem();
+            await supplyChain.harvestItem(
+                upc,
+                originFarmerID,
+                originFarmName,
+                originFarmInformation,
+                originFarmLatitude,
+                originFarmLongitude,
+                productNotes);
         });
 
         it('item has correct data', async function () {
-            const resultBufferOne = await supplyChain.fetchItemBufferOne.call(thisUPC);
+            const resultBufferOne = await supplyChain.fetchItemBufferOne.call(upc);
             assert.equal(resultBufferOne[0], sku, 'Error: Invalid item SKU');
-            assert.equal(resultBufferOne[1], thisUPC, 'Error: Invalid item UPC');
+            assert.equal(resultBufferOne[1], upc, 'Error: Invalid item UPC');
             assert.equal(resultBufferOne[2], originFarmerID, 'Error: Missing or Invalid ownerID');
             assert.equal(resultBufferOne[3], originFarmerID, 'Error: Missing or Invalid originFarmerID');
             assert.equal(resultBufferOne[4], originFarmName, 'Error: Missing or Invalid originFarmName');
@@ -82,7 +86,7 @@ contract('SupplyChain', async accounts => {
         });
 
         it('item has correct state', async function () {
-            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(thisUPC)
+            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc)
             assert.equal(resultBufferTwo[5], 0, 'Error: Invalid item State');
         });
 
@@ -97,22 +101,28 @@ contract('SupplyChain', async accounts => {
 
     describe('When coffee is processed', async function () {
         let eventEmitted = false;
-        let thisUPC = upc;
         before(async function () {
-            supplyChain = await SupplyChain.deployed();
             let event = supplyChain.Processed();
             event.on('data', e => {
                 eventEmitted = true;
             });
-            await harvestItem();
+        });
+
+        it('forbids to process by non-farmer', async function () {
+            try {
+                await supplyChain.processItem(upc, {from: distributorID});
+                assert.fail("Should not allow to process");
+            } catch (error) {
+                assert.equal("Not a farmer", error.reason);
+            }
         });
 
         it('processes without error', async function () {
-            await supplyChain.processItem(thisUPC, {from: originFarmerID});
+            await supplyChain.processItem(upc, {from: originFarmerID});
         });
 
         it('item has correct state', async function () {
-            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(thisUPC);
+            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
             assert.equal(resultBufferTwo[5], 1, 'Expected "Processed" state');
         });
 
@@ -120,27 +130,40 @@ contract('SupplyChain', async accounts => {
             assert.equal(eventEmitted, true, 'Event was not emitted');
         });
 
-    });
-    // -----------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------
-    // -----------------------------------------------------------------------------
 
-    // 2nd Test
-    // it("Testing smart contract function processItem() that allows a farmer to process coffee", async () => {
-    //     // Declare and Initialize a variable for event
-    //
-    //     // Watch the emitted event Processed()
-    //
-    //
-    //     // Mark an item as Processed by calling function processtItem()
-    //
-    //     // Retrieve the just now saved item from blockchain by calling function fetchItem()
-    //
-    //
-    //     // Verify the result set
-    //
-    // })
+    });
+
+    describe('When coffee is packed', async function () {
+        let eventEmitted = false;
+        before(async function () {
+            let event = supplyChain.Packed();
+            event.on('data', e => {
+                eventEmitted = true;
+            });
+        });
+
+        it('forbids to pack by non-farmer', async function () {
+            try {
+                await supplyChain.processItem(upc, {from: distributorID});
+                assert.fail("Should not allow to pack");
+            } catch (error) {
+                assert.equal("Not a farmer", error.reason);
+            }
+        });
+
+        it('processes without error', async function () {
+            await supplyChain.packItem(upc, {from: originFarmerID});
+        });
+
+        it('item has correct state', async function () {
+            const resultBufferTwo = await supplyChain.fetchItemBufferTwo.call(upc);
+            assert.equal(resultBufferTwo[5], 2, 'Expected "Packed" state');
+        });
+
+        it('emits correct event', async function () {
+            assert.equal(eventEmitted, true, 'Event was not emitted');
+        });
+    });
 
     // // 3rd Test
     // it("Testing smart contract function packItem() that allows a farmer to pack coffee", async () => {
