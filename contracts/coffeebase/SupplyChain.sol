@@ -146,7 +146,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         Item memory item = Item(
             sku,
             _upc,
-            msg.sender,
+            _originFarmerID,
             _originFarmerID,
             _originFarmName,
             _originFarmInformation,
@@ -288,6 +288,7 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         ownerID = item.ownerID;
         originFarmerID = item.originFarmerID;
         originFarmName = item.originFarmName;
+        originFarmInformation = item.originFarmInformation;
         originFarmLatitude = item.originFarmLatitude;
         originFarmLongitude = item.originFarmLongitude;
 
@@ -318,8 +319,14 @@ contract SupplyChain is FarmerRole, DistributorRole, RetailerRole, ConsumerRole 
         address consumerID
     )
     {
-        // Assign values to the 9 parameters
+        Item memory item = items[_upc];
+        require(item.ownerID != address(0));
 
+        itemSKU = item.sku;
+        itemUPC = item.upc;
+        productID = item.productID;
+        productNotes = item.productNotes;
+        productPrice = item.productPrice;
 
         return
         (
